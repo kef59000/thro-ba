@@ -1,5 +1,5 @@
 
-setwd("C:/Users/LocalAdmin/Dropbox/TH Rosenheim/01 - Kurse/01 Business Analytics/thro_ba")
+setwd("C:/Users/LocalAdmin/Dropbox/TH Rosenheim/01 - Kurse/01 Business Analytics/thro-ba")
 
 # Libraries ---------------------------------------------------------------
 # Database
@@ -13,9 +13,9 @@ library(tidyverse)
 
 # Get Data ----------------------------------------------------------------
 # CSV
-csv_customer <- fread("thro_shpmt/customer.csv", sep=";", header= TRUE, encoding = 'Latin-1')
-csv_plant <- fread("thro_shpmt/plant.csv", sep=";", header= TRUE, encoding = 'Latin-1')
-csv_shipment <- fread("thro_shpmt/shipment.csv", sep=";", header= TRUE, encoding = 'Latin-1')
+csv_customer <- fread("thro_shpmt_csv/customer.csv", sep=";", header= TRUE, encoding = 'Latin-1')
+csv_plant <- fread("thro_shpmt_csv/plant.csv", sep=";", header= TRUE, encoding = 'Latin-1')
+csv_shipment <- fread("thro_shpmt_csv/shipment.csv", sep=";", header= TRUE, encoding = 'Latin-1')
 
 # SQLite
 con <- dbConnect(RSQLite::SQLite(), "thro_shpm.db", encoding = "utf-8")

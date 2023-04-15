@@ -1,5 +1,5 @@
 
-# setwd("C:/Users/LocalAdmin/Dropbox/TH Rosenheim/01 - Kurse/01 Business Analytics/thro_ba")
+# setwd("C:/Users/LocalAdmin/Dropbox/TH Rosenheim/01 - Kurse/01 Business Analytics/thro-ba")
 
 source('app_global.R')
 
