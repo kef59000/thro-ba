@@ -10,7 +10,7 @@ descriptive_analytics_UI <- function(id){
           column(width=2, selectizeInput(ns("KArt"), label="Kunden: Art", choices = NULL, multiple=TRUE)),
           column(width=2, selectizeInput(ns("KGrp"), label="Kunden: Gruppe", choices = NULL, multiple=TRUE)),
           column(width=2, selectizeInput(ns("KTyp"), label="Kunden: Typ", choices = NULL, multiple=TRUE)),
-          column(width=3, sliderInput(ns("Bestellvolumen"), "Bestellvolumen [to]", min=0, max=999999, value=999999/2, step=100)))),
+          column(width=3, sliderInput(ns("Bestellvolumen"), "Bestellvolumen [to]", min=0, max=9999, value=9999/2, step=100)))),
     fluidRow(
       uiOutput(ns("box_pie")),
       uiOutput(ns("box_tbl"))
@@ -116,6 +116,75 @@ descriptive_analytics <- function(input, output, session){
 
   # Analyze Data ------------------------------------------------------------
   
- 
+  # Pie
+  output$pie <- renderPlotly({
+    
+    data <- data_filtered() %>%
+      group_by(Kart) %>%
+      summarise(tons = sum(GWkg)/1000) %>%
+      ungroup()
+    
+    plot <- ggplot(data=data, aes(x=Kart, y=tons)) +
+      geom_bar(stat="identity")
+    
+    ggplotly(plot)
+    })
+  
+  
+  # Table
+  output$table <- renderDataTable({
+    
+    temp <- data_filtered() %>%
+      select(del_date, Plant, Kname, KPlz, Kort, GWkg)
+    
+    DT::datatable(temp, filter = "top", options = list(pageLength = 5))
+  })
+  
+  
+  # Histogram
+  output$histo <- renderPlotly({
+    
+    data <- data_filtered() %>%
+      mutate(week = week(del_date)) %>%
+      group_by(week) %>%
+      summarise(tons = sum(GWkg)/1000) %>%
+      ungroup()
+    
+    fit <- lm(tons ~ week, data = data)
+    
+    plot_ly(x = ~week) %>%
+      add_trace(data=data, y= ~tons, type='bar', name='Order volume',
+                hoverinfo='text', text= ~format(round(tons,0), nsmall=0, big.mark='.', decimal.mark=',')) %>%
+      add_lines(y = fitted(fit), name = 'Regression Line') %>%
+      layout(title='', showlegend=T)
+    })
+  
+  
+  # Map
+  output$map <- renderLeaflet({
+    
+    leaflet(data=customer) %>%
+      addProviderTiles(providers$OpenStreetMap.DE) %>%
+      fitBounds(~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude))
+    })
+  
+  
+  map_data <- reactive({
+    
+    temp <- data_filtered() %>%
+      group_by(`Ship-to2`, Kname, Kstrasse, KPlz, Kort, Kart, Latitude_customer, Longitude_customer) %>%
+      summarise(Pallets = sum(Pallets), GWkg = sum(GWkg)) %>%
+      ungroup() %>%
+      mutate(popup_content = paste(sep='<br/>',
+                                   paste0('<b>',Kname,'</b>'), Kstrasse, KPlz, Kort,
+                                   Kart, round(GWkg/1000, digits=0)))
+    })
+  
+  
+  observe(
+    leafletProxy("map", data = map_data()) %>%
+      clearMarkers() %>% clearMarkerClusters() %>%
+      addAwesomeMarkers(clusterOptions = markerClusterOptions(),
+                        lng = ~Longitude_customer, lat = ~Latitude_customer, popup = ~popup_content))
   
 }
