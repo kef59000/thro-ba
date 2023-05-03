@@ -5,5 +5,8 @@
 
 fk_musterloesung
 
-thro_shpm_csv/*.csv
+*.csv
 *.db
+*.xlsx
+
+*.Rmd
