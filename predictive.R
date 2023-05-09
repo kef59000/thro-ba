@@ -32,17 +32,36 @@ shpm <- db_shipment %>%
   mutate(del_date = dmy(Delivery_day))
 
 
+# Plotting time series data -----------------------------------------------
+
+shpm_ts <- shpm %>%
+  group_by(del_date) %>%
+  summarise(TO_total = sum(GWkg, na.rm = TRUE)/1000) %>%
+  ungroup() %>%
+  arrange(del_date)
 
 
+ggplot(shpm_ts, aes(x=del_date, y=TO_total)) +
+  geom_line() +
+  geom_point() +
+  theme_set(theme_bw()) +
+  labs(title = "Shipments",
+       subtitle = paste0("Calendar Year(s): ", unique(year(shpm_ts$del_date))),
+       x = "Delivery Date",
+       y = "Tonnage Delivered")
 
 
+# Simple linear regression ------------------------------------------------
 
+wdays <- seq(from=1, to=nrow(shpm_ts))
+shpm_ts <- cbind(shpm_ts, wdays)
 
+lm <- lm(data = shpm_ts, formula = TO_total ~ wdays)
+lm %>% summary()
 
+# TO_total = 1346.5182 - 0.3215 * wdays
 
-
-
-
+fwrite(shpm_ts, 'lin_reg.csv', dec=",", sep=";")
 
 
 
