@@ -7,6 +7,5 @@ fk_musterloesung
 
 *.csv
 *.db
-*.xlsx
 
 *.Rmd
