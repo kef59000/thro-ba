@@ -63,10 +63,11 @@ lm %>% summary()
 
 fwrite(shpm_ts, 'lin_reg.csv', dec=",", sep=";")
 
+new <- data.frame(wdays = c(253, 254, 255))
+pred_01 <- predict(lm, newdata = new)
+pred_01
 
-
-
-
-
-
-
+ggplot(shpm_ts, aes(x=del_date, y=TO_total)) +
+  geom_line() +
+  geom_point() +
+  geom_line(y=fitted(lm), color="red")
