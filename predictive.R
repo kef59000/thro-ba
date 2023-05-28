@@ -71,3 +71,110 @@ ggplot(shpm_ts, aes(x=del_date, y=TO_total)) +
   geom_line() +
   geom_point() +
   geom_line(y=fitted(lm), color="red")
+
+
+# Multiple linear regression ----------------------------------------------
+
+us_change
+
+us_change %>% fwrite('us_change.csv', sep=";", dec=",")
+
+lm <- lm(data = us_change, formula = Consumption ~ Income + Production + Savings + Unemployment)
+lm %>% summary()
+
+new <- data.frame(Income = c(1,2,3),
+                  Production = c(1,2,3),
+                  Savings = c(1,2,3),
+                  Unemployment = c(1,2,3))
+
+pred_02 <- predict(lm, newdata=new)
+pred_02
+
+
+# Multiple regression with Dummy variables --------------------------------
+
+shpm_ts <- shpm_ts %>%
+  mutate(week_day = weekdays(del_date))
+
+shpm_ts <- shpm_ts %>%
+  mutate(Di = ifelse(week_day == "Tuesday", 1,0),
+         Mi = ifelse(week_day == "Wednesday", 1,0),
+         Do = ifelse(week_day == "Thursday", 1,0),
+         Fr = ifelse(week_day == "Friday", 1,0)) %>%
+  select(2:3, 5:8)
+
+shpm_ts %>% fwrite('dummy.csv', sep=";", dec=",")
+
+lm <- lm(data=shpm_ts, formula = TO_total ~ wdays + Di + Mi + Do + Fr)
+lm %>% summary()
+
+ggplot(data=shpm_ts, aes(x=wdays)) +
+  geom_line(aes(y=TO_total)) +
+  geom_line(aes(y=fitted(lm)), color="red")
+
+
+
+# TS: Moving Averages -----------------------------------------------------
+
+obs <- c(106.8, 129.2, 153.0, 149.1, 158.3, 132.9, 149.8, 140.3, 138.3, 152.2, 128.1)
+zoo::rollapply(data=obs, width=3, FUN=mean)
+
+
+
+# TS: EXPO-1 --------------------------------------------------------------
+
+obs <- c(134.5, 106.8, 129.2, 153.0, 149.1, 158.3, 132.9, 149.8, 140.3, 138.3, 152.2, 128.1)
+
+data <- tibble(idx = seq(from=1, to=length(obs)),
+               obs = obs) %>%
+  as_tsibble(index=idx)
+
+data %>%
+  model(
+    SES = ETS(obs ~ error("A") + trend("N") + season("N"))
+  ) %>%
+  forecast(h=5) %>%
+  pull(.mean)
+
+
+
+# TS: EXPO-2 --------------------------------------------------------------
+
+obs <- c(26.8, 39.2, 72.3, 71.3, 83.2, 92.9, 121.9, 112.1, 115.8, 154.2, 175.2)
+
+data <- tibble(idx = seq(from=1, to=length(obs)),
+               obs = obs) %>%
+  as_tsibble(index=idx)
+
+data %>%
+  model(
+    Holt = ETS(obs ~ error("A") + trend("A") + season("N"))
+  ) %>%
+  forecast(h=5) %>%
+  pull(.mean)
+
+
+
+# TS: EXPO-3 --------------------------------------------------------------
+
+aus_holidays <- tourism %>%
+  filter(Purpose == 'Holiday') %>%
+  summarise(Trips = sum(Trips)/1e3)
+
+
+fit <- aus_holidays %>%
+  model(
+    additive = ETS(Trips ~ error("A") + trend("A") + season("A")),
+    multiplicative = ETS(Trips ~ error("M") + trend("A") + season("M"))
+  )
+
+fc <- fit %>%
+  forecast(h="3 years")
+fc
+
+fc %>%
+  autoplot(aus_holidays, level = NULL) +
+  labs(title="Australian domestic tourism",
+       y = "Overnight trips (millions)") +
+  guides(colour = guide_legend("Forecast"))
+
