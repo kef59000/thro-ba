@@ -13,9 +13,9 @@ library(tidyverse)
 
 # Get Data ----------------------------------------------------------------
 # CSV
-csv_customer <- fread("thro_shpmt_csv/customer.csv", sep=";", header= TRUE, encoding = 'Latin-1')
-csv_plant <- fread("thro_shpmt_csv/plant.csv", sep=";", header= TRUE, encoding = 'Latin-1')
-csv_shipment <- fread("thro_shpmt_csv/shipment.csv", sep=";", header= TRUE, encoding = 'Latin-1')
+csv_customer <- fread("thro_shpm_csv/customer.csv", sep=";", header= TRUE, encoding = 'Latin-1')
+csv_plant <- fread("thro_shpm_csv/plant.csv", sep=";", header= TRUE, encoding = 'Latin-1')
+csv_shipment <- fread("thro_shpm_csv/shipment.csv", sep=";", header= TRUE, encoding = 'Latin-1')
 
 # SQLite
 con <- dbConnect(RSQLite::SQLite(), "thro_shpm.db", encoding = "utf-8")
