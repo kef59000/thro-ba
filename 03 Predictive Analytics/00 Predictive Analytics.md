@@ -30,3 +30,8 @@ Der Gewürzhersteller Pfefferling verwendet zur Prognose der Kundennachfrage fü
 1. Prognostizieren Sie den Absatz $\hat{y}(t)$ für t=11 und t=12 anhand des Verfahrens der einfachen exponentiellen Glättung. Verwenden Sie als Glättungsfaktor $\alpha$ = 0,2.
 2. Wie sollte Pfefferling den Glättungsfaktor $\alpha$ anpassen, damit seine Prognose schneller auf Niveauverschiebungen reagiert (ohne Rechnung)?
 3. Ist das von Pfefferling angewandte Verfahren für das Produkt und dessen Nachfrageverlauf angemessen? Geben Sie eine kurze begründete Antwort und machen Sie gegebenenfalls eine Empfehlung (ohne Rechnung).
+
+
+### Lösung
+
+![Alt text](<Bildschirmfoto 2023-12-07 um 16.22.41.png>)
